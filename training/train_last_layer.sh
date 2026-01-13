@@ -1,0 +1,27 @@
+#!/bin/bash
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+
+set -x
+GPUS=$1
+
+exp_name=medvit_cls_exp
+time=$(date "+%m%d_%H%M%S")
+save_root_dir=../${exp_name}/${time}
+
+if [ ! -d ${save_root_dir} ]; then
+    mkdir -p ${save_root_dir}
+    echo save root dir is ${save_root_dir}.
+else
+    echo Error, save root dir ${save_root_dir} exist, please run the shell again!
+    exit 1
+fi
+
+python3 -m torch.distributed.launch --nproc_per_node=$GPUS --use_env \
+    --master_port=29601  \
+    $parent_path/main_last_layer.py \
+    --output-dir ${save_root_dir} \
+    --dist-eval ${@:2}
+#python3 -m torch.distributed.launch --nproc_per_node=$GPUS --use_env $parent_path/main.py \
+#--output-dir ${save_root_dir} \
+#--dist-eval ${@:2}
+
