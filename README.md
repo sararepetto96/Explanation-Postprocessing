@@ -4,6 +4,8 @@ This repository contains the official PyTorch implementation of the paper: **Pos
 
 The codebase supports training, explanation generation, and robustness and fidelity evaluation of post-hoc explanation methods in medical imaging, including ensemble strategies and adversarial robustness analysis.
 
+In addition, the repository provides a PDF with supplementary experimental results, available in the additional_results_pdf directory.
+
 
 ## Dependencies and Reproducibility
 
@@ -63,7 +65,7 @@ python ExplainableModels.py --model_name model --train_data_name dataset --n_cla
 python ExplainableModels.py --model_name model --train_data_name dataset --n_classes classes --data_name dataset_corrupted_{corruption_type} 
 ```
 
-After having executed the main functiont, a folder structure inside **attributions**" will be created containing npz files with explanations.
+After having executed the main functiont, a folder structure inside **attributions** will be created containing npz files with explanations.
 
 ### 3. ROBUSTNESS AGAINST NATURAL CORRUPTIONS AND FIDELITY 
 
@@ -114,7 +116,7 @@ ADD --no-post_processing to evaluate raw explanations instead of post-processed 
 
 After having executed the main function, a folder structure inside **results** will be created containing json files with results.
 
-To illustrate and analyze the execution flow of the different experiments, the file evaluation.ipynb is provided.
+**To illustrate and analyze the execution flow of the different experiments, the file evaluation.ipynb is provided.**
 
 ## Acknowledgements
  The authors would like to thank the contributors of [captum](https://github.com/pytorch/captum) for having facilitated the development of this project.
