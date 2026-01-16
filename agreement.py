@@ -119,10 +119,7 @@ def l1_distance(attributions_a: torch.Tensor, attributions_b: torch.Tensor) -> t
         attributions_a = attributions_a.cuda()
     if attributions_b.device.type =='cpu':
         attributions_b = attributions_b.cuda()
-    try:
-        diff = (attributions_a - attributions_b).abs()
-    except:
-        breakpoint()
+    diff = (attributions_a - attributions_b).abs()
     return diff.mean()
 
 

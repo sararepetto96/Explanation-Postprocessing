@@ -58,7 +58,7 @@ data_rob = {}
 data_adv = {}
 
 # ============================================================
-# DATA LOADING (COME NEL TUO CODICE)
+# DATA LOADING 
 # ============================================================
 for model in ["resnet50", "densenet121", "regnety_008"]:
     model_tex = model_names_tex[model]
@@ -128,9 +128,7 @@ for model in ["resnet50", "densenet121", "regnety_008"]:
   
         best_adv_res =[r for r in adv_res if r.get("technique") == best_technique]
         best_adv_res_post =[r for r in adv_res_post if r.get("technique") == best_technique and r.get("kernel_size") == best_kernel]
-        #adv_sorted = sorted(adv_res, key=lambda x: x["adversarial_robustness"])
-        #adv_sorted_post = sorted(adv_res_post, key=lambda x: x["adversarial_robustness"])
-
+    
         adv = [
             round(best_adv_res[0]["adversarial_robustness"], 3),
             round(adv_mean[0]["adversarial_robustness"], 3),

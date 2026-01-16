@@ -6,8 +6,6 @@ from torchvision.datasets import ImageFolder
 class MedDataset(ImageFolder):
     
     def __init__(self, root:str, transform: torch.nn.Module = None):
-
-        #root = f"data/{data_name}_224/{data_split}"
         
         super().__init__(root, transform)
         

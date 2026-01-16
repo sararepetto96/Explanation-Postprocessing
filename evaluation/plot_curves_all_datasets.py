@@ -5,9 +5,7 @@ import json
 import argparse
 from matplotlib.lines import Line2D
 
-# ------------------------------
-# Funzioni
-# ------------------------------
+
 def select_best_techniques(results, n_best=3):
     """Seleziona le migliori tecniche basate su accuracy_curve[2] con kernel_size=1"""
     results_k1 = [r for r in results if r["kernel_size"] == 1]
@@ -21,10 +19,10 @@ def plot_accuracy_curves(ax, results, selected_techniques, steps,
     """Plotta le curve di accuratezza per le tecniche selezionate,
        mostrando solo 2 valori prima e 2 dopo central_idx."""
     
-    # calcola gli indici da usare sull'asse x
+
     start_idx = 0
-    end_idx = min(len(steps), central_idx + 3)  # +3 perché slicing esclusivo
-    selected_steps = steps[start_idx:end_idx]   # solo 5 valori
+    end_idx = min(len(steps), central_idx + 3)  
+    selected_steps = steps[start_idx:end_idx]   
 
     for t_idx, tech in enumerate(selected_techniques):
         base_color = technique_colors[t_idx]
@@ -46,27 +44,22 @@ def plot_accuracy_curves(ax, results, selected_techniques, steps,
                 marker=marker,
                 linewidth=2,
                 markersize=5,
-                markevery=1  # pochi punti, meglio marker su tutti
+                markevery=1  
             )
 
             if len(selected_steps) > 5:
-                ax.set_xticks(selected_steps[::2])  # mostra solo un tick ogni 2
+                ax.set_xticks(selected_steps[::2])  
             else:
                 ax.set_xticks(selected_steps)
 
     ax.set_ylabel("$\mathtt{F}$", fontsize=14)
     ax.set_xlabel("p", fontsize=14, labelpad=10)
-    ax.xaxis.set_label_coords(0.5, -0.15)  # centra label x
+    ax.xaxis.set_label_coords(0.5, -0.15)  
 
-    # imposta i tick solo sui selected_steps
-    #ax.set_xticks(selected_steps)
     ax.tick_params(axis='both', labelsize=12)
     ax.grid(True)
 
 
-# ------------------------------
-# Argomenti
-# ------------------------------
 parser = argparse.ArgumentParser(description="Explanation analysis plot")
 parser.add_argument("--corruption_type", type=str, default="gaussian_noise")
 parser.add_argument("--agreement_measure", type=str, default="l1")
@@ -146,11 +139,9 @@ kernel_markers = {1: "o", 3: "s", 5: "D", 7: "^"}
 technique_colors = {0: "#1f77b4", 1: "#ff7f0e", 2: "#9467bd"}
 linestyles = {0: "-", 1: "--", 2: ":"}
 
-# ------------------------------
-# Ciclo su modelli
-# ------------------------------
+
 for model_name in args.models:
-    # Pre-calcola ymin/ymax globali
+ 
     all_values = []
     for dataset in datasets:
         file_path = f"results/{dataset}/fidelity_and_robustness/" \
@@ -167,7 +158,6 @@ for model_name in args.models:
     ymin -= margin
     ymax += margin
 
-    # Crea figura 3x3
     fig, axes = plt.subplots(3, 3, figsize=(18, 16))
     axes = axes.flatten()
 
@@ -191,15 +181,12 @@ for model_name in args.models:
         
         ax.set_title(dataset_names_tex[dataset], fontsize=14)
 
-    # rimuove subplot extra (non necessario qui perché sono 9)
+ 
     for ax in axes[len(datasets):]:
         ax.axis('off')
 
     plt.tight_layout(rect=[0, 0.08, 1, 0.95])
 
-    # ------------------------------
-    # Legenda comune
-    # ------------------------------
     legend_elements = []
     technique_labels = ["Best technique", "2nd best technique", "3rd best technique"]
     for i, label in enumerate(technique_labels):
@@ -212,9 +199,7 @@ for model_name in args.models:
     fig.legend(handles=legend_elements, loc='upper center',
                bbox_to_anchor=(0.5, 0.09), ncol=5, fontsize=13, frameon=True)
 
-    # ------------------------------
-    # Salva figura
-    # ------------------------------
+    
     save_path = f"results/all_datasets_{model_name}.png"
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.close()

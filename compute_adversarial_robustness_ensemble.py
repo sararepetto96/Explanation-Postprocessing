@@ -75,7 +75,7 @@ def compute_mean_attributions(topk_entries,train_data_name, model_name,
         origin_path = f"original_explanations/{model_name}/{train_data_name}/{train_data_name}_test/{tech}_2.npz"
         adv_path = f"adversarial_explanations/{model_name}/{train_data_name}/{train_data_name}_test/{tech}_2.npz" 
         if not os.path.exists(origin_path) or not os.path.exists(adv_path):
-            print('Bisogna fae prima la robusteza avversaria')
+            print("First, we need to compute adversarial robustness.")
             break
 
         attributions = load_explanations_npz(origin_path)

@@ -16,12 +16,9 @@ from collections import defaultdict
 from tqdm import tqdm
 
 def get_shaded_color(base_color, fraction):
-    """
-    Restituisce una sfumatura più chiara del colore base, ma non troppo slavata.
-    Sfuma verso un grigio chiaro invece che verso il bianco puro.
-    """
+    
     base_rgb = np.array(mcolors.to_rgb(base_color))
-    target = np.array([1, 1, 1])  # colore più scuro del bianco
+    target = np.array([1, 1, 1])  
     return base_rgb + (target - base_rgb) * fraction
 
 def get_dataloader(data_name, data_split, batch_size):
@@ -89,14 +86,14 @@ def plot(data_name:str,model_name:str,corruption_type:str,agreement_measure:str,
     ]
     
     kernel_sizes = [1, 3, 5, 7,11]
-    #kernel_sizes = [1, 3]
+ 
     results = []
 
     base_path = Path(f"results/{data_name}/fidelity_and_robustness/{normalization}/{agreement_measure}/{model_name}/{corruption_type}")
     results_file = base_path / f"results"
 
     if results_file.exists():
-        print("✅ Risultati già presenti, caricamento da file…")
+        print("✅  Results already present, loading from file...")
         with open(results_file, 'r') as f:
             results = json.load(f)
         results = [d for d in results if d['kernel_size'] not in [15,21]]
@@ -136,11 +133,11 @@ def plot(data_name:str,model_name:str,corruption_type:str,agreement_measure:str,
 
             
     kernel_markers = {
-        1: 'o',   # cerchio
-        3: 'v',  # triangolo giù
-        5: 's',   # quadrato
-        7: 'D',   # diamante
-        11: '^' # triangolo su
+        1: 'o',   
+        3: 'v',  
+        5: 's',   
+        7: 'D',   
+        11: '^' 
     }
     steps=np.linspace(0, 0.5, 11)
    
@@ -496,11 +493,11 @@ def plot_with_topk(
     results_file = base_path / f"results"
 
     if results_file.exists():
-        print("✅ Risultati già presenti, caricamento da file…")
+        print("✅ Results already present, loading from file...")
         with open(results_file, 'r') as f:
             results = json.load(f)
     else:
-        print("🧮 Calcolo risultati base...")
+        print("🧮 Calculating basic results...")
         for technique in techniques:
             for k in kernel_sizes:
                 steps, accs, rob = robustness_and_fidelity(
@@ -527,9 +524,9 @@ def plot_with_topk(
 
     if ensemble_type == 'no_postprocessing':
         results = [r for r in results if r['kernel_size'] == 1]
-        print("🧩 Ensemble type: NO SMOOTHING (solo kernel=1)")
+        print("🧩 Ensemble type: NO SMOOTHING (only kernel=1)")
     else:
-        print("🧩 Ensemble type: ALL (tutti i kernel e tecniche)")
+        print("🧩 Ensemble type: ALL (all kernel sizes and methods)")
 
     results_with_topk = []
     results_file_topk = base_path / f"results_ensemble_topk_{ensemble_type}"
@@ -545,11 +542,11 @@ def plot_with_topk(
    
 
     if results_file_topk.exists():
-        print("✅ Risultati top-k già presenti, caricamento...")
+        print("✅ Top-k results already present, loading...")
         with open(results_file_topk, 'r') as f:
             results_with_topk = json.load(f)
     else:
-        print("⚙️ Calcolo risultati top-k...")
+        print("⚙️ Calculating top-k results...")
 
         for k in (range(1,max_values[f'{ensemble_type}'])): 
 
@@ -728,11 +725,11 @@ def plot_mean_ensemble(
     results_file = base_path / f"results"
 
     if results_file.exists():
-        print("✅ Risultati già presenti, caricamento da file…")
+        print("✅ Results already available, loading from file..")
         with open(results_file, 'r') as f:
             results = json.load(f)
     else:
-        print("🧮 Calcolo risultati base...")
+        print("🧮 Calculating basic results...")
         for technique in techniques:
             for k in kernel_sizes:
                 steps, accs, rob = robustness_and_fidelity(
@@ -763,11 +760,11 @@ def plot_mean_ensemble(
     results_file_ensemble = base_path / f"results_mean_ensemble_{ensemble_type}"
 
     if results_file_ensemble.exists():
-        print("✅ Risultati mean ensemble già presenti, caricamento...")
+        print("✅ Mean ensemble results already present, loading...")
         with open(results_file_ensemble, 'r') as f:
             results_with_topk = json.load(f)
     else:
-        print(f"🧩 Calcolo mean ensemble: {ensemble_type}")
+        print(f"🧩 Mean ensemble calculation: {ensemble_type}")
 
         results_with_topk = []
 

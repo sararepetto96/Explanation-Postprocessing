@@ -21,7 +21,5 @@ python3 -m torch.distributed.launch --nproc_per_node=$GPUS --use_env \
     $parent_path/main_last_layer.py \
     --output-dir ${save_root_dir} \
     --dist-eval ${@:2}
-#python3 -m torch.distributed.launch --nproc_per_node=$GPUS --use_env $parent_path/main.py \
-#--output-dir ${save_root_dir} \
-#--dist-eval ${@:2}
+
 

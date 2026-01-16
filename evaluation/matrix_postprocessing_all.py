@@ -31,7 +31,7 @@ parser.add_argument('--no-occluded_most_important', dest='occluded_most_importan
 args = parser.parse_args()
 
 corruption_types = [
-    "gaussian_noise",   # gaussian_noise (o quello passato)
+    "gaussian_noise",   
     "pixelate",
     "brightness_up"
 ]
@@ -47,7 +47,6 @@ for corr in corruption_types:
         results_list.append(json.load(f))
 
 
-##fare in modo che la working che vede è quella principale
 path = f'results/{args.data_name}/fidelity_and_robustness/{args.normalization}/{args.agreement_measure}/{args.model_name}/{args.corruption_type}'
 file_path = f'{path}/results_0'
 adv_path = f'results/{args.data_name}/fidelity_and_robustness/{args.normalization}/{args.agreement_measure}/{args.model_name}/adversarial_robustness_new_2'
@@ -85,8 +84,6 @@ df_normal_adv["kernel_size"] = pd.to_numeric(df_normal_adv["kernel_size"], error
 
 matrix_fidelity = df_normal.pivot_table(index="technique", columns="kernel_size", values="fidelity_value")
 matrix_fidelity = matrix_fidelity[sorted(matrix_fidelity.columns)]
-#matrix_natural_noise = df_normal.pivot_table(index="technique", columns="kernel_size", values="robustness")
-#matrix_natural_nosie = matrix_natural_noise[sorted(matrix_natural_noise.columns)]
 matrix_adv_noise = df_normal_adv.pivot_table(index="technique", columns="kernel_size", values="adversarial_robustness")
 matrix_adv_nosie = matrix_adv_noise[sorted(matrix_adv_noise.columns)]
 
@@ -116,13 +113,7 @@ title = [
 ]
 
 matrix_fidelity = matrix_fidelity.rename(index=tech_abbrev)
-#matrix_natural = matrix_natural_noise.rename(index=tech_abbrev)
 matrix_adv_noise = matrix_adv_noise.rename(index=tech_abbrev)
-#matrices = [
-    #matrix_fidelity,
-    #matrix_natural_noise,
-    #matrix_adv_noise
-#]
 
 matrices = [
     matrix_fidelity,
@@ -133,18 +124,11 @@ matrices = [
 ]
 
 
-
-#fig = plt.figure(figsize=(20, 4.5))
-#gs = GridSpec(1, 4, width_ratios=[-0.05, 1, 1, 1], wspace=0.08)
-
 fig = plt.figure(figsize=(28, 4.5))
 gs = GridSpec(1, 6, width_ratios=[-0.05, 1, 1, 1, 1, 1], wspace=0.08)
 
 ax_labels = fig.add_subplot(gs[0])
 axes = [fig.add_subplot(gs[i]) for i in range(1, 6)]
-
-#ax_labels = fig.add_subplot(gs[0])
-#axes = [fig.add_subplot(gs[i]) for i in range(1, 4)]
 
 norms = [
     PowerNorm(
@@ -171,15 +155,6 @@ norms = [
         base=10
     )
     ]
-    
-
-
-#cmaps = [
-    #"mako",        # Fidelity
-    #"rocket",      # Natural noise 
-    #"crest_r"         # Adversarial 
-   
-#]
 
 cmaps = ["mako"] * 5
 
@@ -267,7 +242,7 @@ for i, ax in enumerate(axes):
 
     cbar = fig.colorbar(sm, cax=cax, orientation="horizontal")
     cbar.ax.tick_params(labelsize=9)
-breakpoint()
+
 plt.savefig(f'{path}/matrix_all.png', dpi=300, bbox_inches="tight")
 plt.show()
 

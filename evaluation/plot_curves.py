@@ -291,30 +291,8 @@ for idx, metric in enumerate(metrics):
         ax.set_title(title[metric])
         ax.set_xlabel(x_title[metric])
 
-        
-        
 
-    
-
-
-    # --------------------------------------------------
-    # Remove unused subplot (8th)
-    # --------------------------------------------------
-    #axes[-1].axis("off")
-
-
-# --------------------------------------------------
-# Global title
-# --------------------------------------------------
-#fig.suptitle(
-    #"Impact of postprocessing\n"
-    #"(Best-3 Techniques)",
-    #fontsize=18,
-#)
-
-#plt.tight_layout(rect=[0, 0.03, 1, 0.92])
 plt.tight_layout(rect=[0, 0.08, 1, 0.92])
-#plt.tight_layout(rect=[0, 0.08, 0.85, 0.92])
 
 legend_elements = []
 
@@ -351,7 +329,7 @@ for k, m in kernel_markers.items():
 fig.legend(
     handles=legend_elements,
     loc="center left",
-    bbox_to_anchor=(1.00, 0.5),  # a destra, centrata verticalmente
+    bbox_to_anchor=(1.00, 0.5),  
     ncol=1,
     fontsize=11,
     frameon=True

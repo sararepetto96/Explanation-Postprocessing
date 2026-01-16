@@ -176,12 +176,7 @@ def occlusion_robustness_curve_fast(
             preds_all.append(preds)
             labels_all.append(labels)
         
-        correct = (torch.cat(preds_all) == torch.cat(labels_all)).float()
-        #acc_std = correct.std(unbiased=False).item()
-        #all_values = correct.cpu().numpy()
         acc = (torch.cat(preds_all) == torch.cat(labels_all)).float().mean().item()
         accuracies.append(acc)
-        #accuracies_var.append(acc_std)
-        #accuracies_tot.append(all_values)
-
+        
     return occlusion_steps, accuracies

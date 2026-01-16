@@ -57,7 +57,7 @@ data_rob_bri = {}
 data_rob_pix = {}
 
 # ============================================================
-# DATA LOADING (COME NEL TUO CODICE)
+# DATA LOADING 
 # ============================================================
 for model in ["resnet50", "densenet121", "regnety_008"]:
     model_tex = model_names_tex[model]

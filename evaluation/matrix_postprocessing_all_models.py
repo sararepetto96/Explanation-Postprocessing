@@ -123,7 +123,7 @@ titles = [
 ]
 
 corruption_types = [
-    "gaussian_noise",   # gaussian_noise (o quello passato)
+    "gaussian_noise",  
     "pixelate",
     "brightness_up"
 ]
@@ -139,7 +139,6 @@ def build_matrices(data_name, model_name, args):
             results_list.append(json.load(f))
 
 
-    ##fare in modo che la working che vede è quella principale
     path = f'results/{data_name}/fidelity_and_robustness/quantil_local/l1/{model_name}/{args.corruption_type}'
     file_path = f'{path}/results'
     adv_path = f'results/{data_name}/fidelity_and_robustness/quantil_local/l1/{model_name}/adversarial_robustness_new_2'
@@ -177,8 +176,6 @@ def build_matrices(data_name, model_name, args):
 
     matrix_fidelity = df_normal.pivot_table(index="technique", columns="kernel_size", values="fidelity_value")
     matrix_fidelity = matrix_fidelity[sorted(matrix_fidelity.columns)]
-    #matrix_natural_noise = df_normal.pivot_table(index="technique", columns="kernel_size", values="robustness")
-    #matrix_natural_nosie = matrix_natural_noise[sorted(matrix_natural_noise.columns)]
     matrix_adv_noise = df_normal_adv.pivot_table(index="technique", columns="kernel_size", values="adversarial_robustness")
     matrix_adv_nosie = matrix_adv_noise[sorted(matrix_adv_noise.columns)]
 
@@ -208,13 +205,8 @@ def build_matrices(data_name, model_name, args):
     ]
 
     matrix_fidelity = matrix_fidelity.rename(index=tech_abbrev)
-    #matrix_natural = matrix_natural_noise.rename(index=tech_abbrev)
     matrix_adv_noise = matrix_adv_noise.rename(index=tech_abbrev)
-    #matrices = [
-        #matrix_fidelity,
-        #matrix_natural_noise,
-        #matrix_adv_noise
-    #]
+
     matrices = [
     matrix_fidelity,
     natural_matrices[0],   # gaussian
@@ -268,7 +260,7 @@ for r, (dataset, model) in enumerate(configs):
     fontweight="bold"
 )
 
-    # ---- norms per riga ----
+    
     norms = [
         PowerNorm(0.5, matrices[0].min().min(), matrices[0].max().max()),
         PowerNorm(0.5, matrices[1].min().min(), matrices[1].max().max()),
@@ -281,18 +273,15 @@ for r, (dataset, model) in enumerate(configs):
         )
     ]
 
-    # ---- cerchi gialli (SOLO dalla fidelity) ----
     yellow_indexes = []
 
     for tech in matrix_fidelity.index:
         row = matrix_fidelity.loc[tech]
         
-        best = row.min()                        # il migliore valore nella riga (min)
+        best = row.min()                        
         best_kernel = row.idxmin()
-        threshold = best * 1.05                  # massimo consentito (+5%)
+        threshold = best * 1.05                  
         
-        # seleziona i valori <= threshold
-        #candidates = row[row <= threshold]
         candidates = row[
                 (row <= threshold) &
                 (row.index > best_kernel)
@@ -301,19 +290,18 @@ for r, (dataset, model) in enumerate(configs):
         if len(candidates) == 0:
             yellow_indexes.append(None)
         else:
-            # prendi il massimo tra i candidati validi
             chosen_col = candidates.idxmax()
             yellow_indexes.append(list(matrix_fidelity.columns).index(chosen_col))
         
     red_indexes=[]
 
-    # ---- heatmaps ----
+   
     for i, ax in enumerate(axes):
         sns.heatmap(
             matrices[i],
             cmap=cmaps[i],
             norm=norms[i],
-            annot=True,        # annot solo prima riga
+            annot=True,        
             fmt=".3f",
             linewidths=0.4,
             cbar=False,
@@ -324,7 +312,6 @@ for r, (dataset, model) in enumerate(configs):
 
         for el, tech in enumerate(matrices[i].index):
 
-            # rosso
             if i == 0:
                 j = matrices[i].loc[tech].idxmin()
                 j_index = list(matrices[i].columns).index(j)
@@ -337,7 +324,6 @@ for r, (dataset, model) in enumerate(configs):
                 0.45, fill=False, edgecolor="red", linewidth=2.2
             ))
 
-            # giallo
             yj = yellow_indexes[el]
             if yj is not None and yj != j_index:
                 ax.add_patch(mpatches.Circle(

@@ -1,8 +1,6 @@
 import json 
 from pathlib import Path
 
-
-# Mappatura per i nomi LaTeX
 model_names_tex = {
     "resnet50": "ResNet50",
     "densenet121": "DenseNet121",
@@ -81,7 +79,6 @@ expl_name_tex = {
 
 }
 
-
 data_robustness_bri = {}
 data_robustness_pix = {}
 best_techniques= {}
@@ -92,16 +89,14 @@ for model_name in ['resnet50', 'densenet121', 'regnety_008']:
     best_techniques[model_names_tex[model_name]]= {}
 
     for data_name in ['tissuemnist', 'retinamnist','dermamnist','pneumoniamnist','octmnist', 'organcmnist','breastmnist','pathmnist','bloodmnist']:
-    #for data_name in [ 'bloodmnist','pathmnist']:
         
         base_path = Path(f"results/{data_name}/fidelity_and_robustness/quantil_local/l1/{model_name}")
         results_file_bri = base_path / "brightness_up/results"
         results_file_pix = base_path / "pixelate/results"
         results_file_adv = Path(f"results/{data_name}/fidelity_and_robustness/quantil_local/l1/{model_name}/adversarial_robustness_new_2")
-        # Valori di default se mancano i file
+       
         list_results = [None] * 6
 
-        # Se il file non esiste, continuo
         if not results_file_bri.exists():
             print(f"⚠️ File mancante: {results_file_bri}")
             data_robustness_bri[model_names_tex[model_name]][data_name] = list_results
@@ -112,15 +107,12 @@ for model_name in ['resnet50', 'densenet121', 'regnety_008']:
             data_robustness_pix[model_names_tex[model_name]][data_name] = list_results
             continue
 
-
-        # Leggi file JSON
         with open(results_file_bri, 'r') as f:
             results_bri = json.load(f)
 
         with open(results_file_pix, 'r') as f:
             results_pix = json.load(f)
 
-        # Controllo che ci siano abbastanza risultati
         if len(results_bri) == 0:
             print(f"⚠️ Nessun risultato in: {results_file_bri}")
             data_robustness_bri[model_names_tex[model_name]][data_name] = list_results
@@ -130,21 +122,19 @@ for model_name in ['resnet50', 'densenet121', 'regnety_008']:
             data_robustness_pix[model_names_tex[model_name]][data_name] = list_results
             continue
 
-        # Separazione post-processed / non post-processed
+    
         results_no_postprocessed_bri = [r for r in results_bri if r['kernel_size'] == 1]
         results_postprocessed_bri = [r for r in results_bri if r['kernel_size'] != 1]
 
         results_no_postprocessed_pix = [r for r in results_pix if r['kernel_size'] == 1]
         results_postprocessed_pix = [r for r in results_pix if r['kernel_size'] != 1]
 
-        # Ordinamento
         results_sorted = sorted(results_postprocessed_bri, key=lambda x: x["accuracy_curve"][pixels[data_name][model_name]])
         results_sorted_no_postprocessed = sorted(results_no_postprocessed_bri, key=lambda x: x["accuracy_curve"][pixels[data_name][model_name]])
 
         results_sorted_pix = sorted(results_postprocessed_pix, key=lambda x: x["accuracy_curve"][pixels[data_name][model_name]])
         results_sorted_no_postprocessed_pix = sorted(results_no_postprocessed_pix, key=lambda x: x["accuracy_curve"][pixels[data_name][model_name]])
 
-        # Prendo fino a 3
         top3_post = results_sorted[:3]
         top3_no_post = results_sorted_no_postprocessed[:3]
 
@@ -158,7 +148,6 @@ for model_name in ['resnet50', 'densenet121', 'regnety_008']:
 
             technique = lst_no_post[i]["technique"]
 
-            # solo post con stessa tecnica
             matching_posts = [
                 r for r in results_postprocessed
                 if r["technique"] == technique
@@ -167,7 +156,6 @@ for model_name in ['resnet50', 'densenet121', 'regnety_008']:
             if not matching_posts:
                 return None
 
-            # ordina per PEGGIORE fidelity
             matching_posts_sorted = sorted(
                 matching_posts,
                 key=lambda x: x["accuracy_curve"][pixels[data_name][model_name]]
@@ -179,7 +167,6 @@ for model_name in ['resnet50', 'densenet121', 'regnety_008']:
 
             
 
-        # Riempio list_results in modo sicuro
         def safe_get(lst, i):
             return round(lst[i]['robustness'], 3) if i < len(lst) else None
             
@@ -315,7 +302,7 @@ def generate_unified_table(data):
             fidelities = [F for (_, F, _, _) in blocks if F is not None]
             best_fid = min(fidelities) if fidelities else None
 
-            best_expl_fid = blocks[0][1]  # best expl raw
+            best_expl_fid = blocks[0][1] 
 
             row = [dataset]
 
@@ -354,16 +341,7 @@ for model in data_robustness_bri.keys():
         rob_bri = data_robustness_bri[model][dataset]
         rob_pix = data_robustness_pix[model][dataset]
 
-        # tecniche best / II / III (non post)
         techniques = best_techniques[model][dataset]
-
-        # le tecniche stanno in top3_no_post → le hai implicitamente
-        # recuperiamole dai risultati fidelity (kernel_size == 1)
-        # qui assumiamo che l'ordine sia coerente
-        # se vuoi essere ultra-sicuro, posso aiutarti a rifinirlo
-        #techniques = [
-           # "IG", "IG", "IG",  # placeholder: sostituisci se vuoi il nome reale
-        #]
 
         row = []
 

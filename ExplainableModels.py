@@ -313,60 +313,6 @@ class ExplainableModel():
                     baselines = torch.zeros_like(input_tensor)
                     method = attr.GradientShap(self.model.cuda())
                     attributions = method.attribute(input_tensor.requires_grad_(), target=target_classes,baselines=baselines)
-
-
-                elif algorithm == "GradCAM":
-        
-                    if self.model_name == "MedVit":
-                        target_layers = self.__get_target_layer_GradCAM_MedViT()
-                    elif self.model_name == "vgg16":
-                        target_layers = self.model.model.features[-1]
-                    elif self.model_name == "densenet121":
-                        target_layers = self.model.model.features[-1]
-                    elif self.model_name == "resnet50":
-                        target_layers = self.model.model.layer1[0].conv1
-                    elif self.model_name =='rexnet_100':
-                        layer = self.model.model.features[-1].conv
-                    elif self.model_name == "convnext_base":
-                        target_layers = self.model.model.stages[-1].blocks[-1].conv_dw
-                    elif self.model_name == "custom_vit_base_patch16_224":
-                        target_layers = self.model.model.blocks[-1].norm1
-                    elif self.model_name == "custom_deit_base_patch16_224":
-                        target_layers = self.model.model.blocks[-1].norm1
-                        
-                    elif self.model_name == "custom_pit_b_224":
-                    
-                        target_layers = self.model.model.transformers[-1].blocks[-1].norm1
-                    else:
-                        raise ValueError(f"CAM not implemented for model {self.model_name}")
-                    
-                    #print(target_layers)
-
-                    if target_layers is None:
-                        raise ValueError(f"CAM target layer not found for model {self.model_name}")
-                
-                    
-                    
-                    target_classes = [ClassifierOutputTarget(c) for c in target_classes.cpu().tolist()] 
-                    
-                    cam = GradCAM(model=self.model, target_layers=[target_layers],reshape_transform=None)
-                    attributions = cam(input_tensor.requires_grad_(), targets=target_classes, eigen_smooth=False)
-                    
-                    cam.activations_and_grads.release() 
-                    
-                    del cam
-                    gc.collect()
-                    torch.cuda.empty_cache()
-                    
-                    # Expand to (BATCH, 3, 224, 224) with zeros
-                    attributions = torch.tensor(attributions, device='cuda')
-                    zeros = torch.zeros(attributions.shape[0], 3, attributions.shape[1], attributions.shape[1],device='cuda', dtype=attributions.dtype)
-                    
-                    zeros[:, 0] = attributions
-                    attributions = zeros
-                    
-                    return attributions.cpu()
-
         
                 else:
                     raise ValueError(f"Invalid algorithm {algorithm}")
@@ -598,11 +544,11 @@ class ExplainableModel():
                 inputs, labels = inputs.cuda(), labels.cuda()
                 outputs = self.model(inputs)
                 _, preds = torch.max(outputs, 1)
-                # Accuratezza totale
+                # Total accuracy
                 total_correct += (preds == labels).sum().item()
                 total_samples += labels.size(0)
 
-                # Accuratezza per classe
+                # Per class accuracy
                 for label, pred in zip(labels, preds):
                     per_class_total[label.item()] += 1
                     if label == pred:
@@ -610,19 +556,16 @@ class ExplainableModel():
 
         overall_accuracy = total_correct / total_samples
 
-        # Calcola accuratezza per classe
+         # Per class accuracy
         per_class_accuracy = {
                 cls: per_class_correct[cls] / per_class_total[cls]
                 for cls in per_class_total
             }
-        # Filtra le classi con accuratezza superiore al 90%
+        #Filters classes with over 90% accuracy
         high_accuracy_classes = {
         cls: acc for cls, acc in per_class_accuracy.items() if acc > 0.90
         }
         
-       # print("Classi con accuratezza > 90%:")
-        #for cls_id, acc in sorted(high_accuracy_classes.items()):
-            #print(f"Class {cls_id}: {acc:.2%}")
         url = (
             "https://raw.githubusercontent.com/tensorflow/models/master/"
             "research/slim/datasets/imagenet_lsvrc_2015_synsets.txt"
@@ -632,11 +575,6 @@ class ExplainableModel():
         synset_list = [line.strip().decode('utf-8') for line in response.readlines()]
 
         return overall_accuracy, per_class_accuracy,high_accuracy_classes
-
-        
-
-        self.model.cpu()
-        return accuracy, len(data)
     
 
     def return_corrected_images(self, data_name:str, data_split:str = "test", batch_size: int = 32):
@@ -662,7 +600,7 @@ class ExplainableModel():
                 
                 mask = (predicted == labels).cpu().numpy()  # converte in numpy array (sul CPU)
 
-                # Step 2: filtra la lista names usando la maschera
+                # Step 2: filter the list of names using the mask
                 images  = [n for n, keep in zip(names, mask) if keep]
                 correct_images.extend(images)
 
@@ -1076,7 +1014,7 @@ def set_all_seeds(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed) # per configurazioni multi-GP
+    torch.cuda.manual_seed_all(seed) 
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     
